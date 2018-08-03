@@ -1,9 +1,10 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import { default as React, PureComponent } from 'react';
-import { AsyncComponent } from 'relaks';
+import { h } from 'preact';
+import { PureComponent } from 'pure-component';
+import { AsyncComponent } from 'relaks/preact';
 import { CommentView } from 'comment-view';
 import { get } from 'hacker-news';
+
+/** @jsx h */
 
 class CommentList extends AsyncComponent {
     static displayName = 'CommentList';
@@ -16,14 +17,14 @@ class CommentList extends AsyncComponent {
             replies,
         };
         meanwhile.show(<CommentListSync {...props} />);
-        let commentIDChunks = _.chunk(commentIDs, 5);
-        await Promise.each(commentIDChunks, async (idChunk) => {
-            let comments = await Promise.map(idChunk, (id) => {
+        for (let i = 0, n = 5; i < commentIDs.length; i += n) {
+            let idChunk = commentIDs.slice(i, i + n);
+            let comments = await Promise.all(idChunk.map(async (id) => {
                 return get(`/item/${id}.json`);
-            });
-            props.comments = _.concat(props.comments, comments);
+            }));
+            props.comments = props.comments.concat(comments);
             meanwhile.show(<CommentListSync {...props} />);
-        });
+        }
         return <CommentListSync {...props} />;
     }
 }
@@ -36,7 +37,7 @@ class CommentListSync extends PureComponent {
         return (
             <div className="comment-list">
             {
-                _.map(commentIDs, (commentID, index) => {
+                commentIDs.map((commentID, index) => {
                     let commentProps = {
                         comment: comments[index],
                         reply: replies

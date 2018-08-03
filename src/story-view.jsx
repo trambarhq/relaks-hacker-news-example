@@ -1,9 +1,10 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import { default as React, PureComponent } from 'react';
-import { AsyncComponent } from 'relaks';
+import { h } from 'preact';
+import { PureComponent } from 'pure-component';
+import { AsyncComponent } from 'relaks/preact';
 import { CommentList } from 'comment-list';
 import { get } from 'hacker-news';
+
+/** @jsx h */
 
 class StoryView extends AsyncComponent {
     static displayName = 'StoryView'
@@ -14,11 +15,11 @@ class StoryView extends AsyncComponent {
             story: story,
             parts: null,
         };
-        if (!_.isEmpty(story.parts)) {
+        if (story.parts && story.parts.length > 0) {
             meanwhile.show(<StoryViewSync {...props} />);
-            props.parts = await Promise.map(story.parts, (id) => {
+            props.parts = await Promise.all(story.parts.map((id) => {
                 return get(`/item/${id}.json`);
-            });
+            }));
         }
         return <StoryViewSync {...props} />;
     }
@@ -62,7 +63,7 @@ class StoryViewSync extends PureComponent {
         let index = story.id % decorativeImages.length;
         let image = decorativeImages[index];
         let extra;
-        if (!_.trim(story.text) && !story.url && _.isEmpty(story.parts)) {
+        if (!(story.text || '').trim() && !story.url && (!story.parts || story.parts.length === 0)) {
             return (
                 <span>
                     <img className="extra-decoration" src={extraDecorativeImage} />
@@ -81,11 +82,14 @@ class StoryViewSync extends PureComponent {
 
     renderParts() {
         let { story, parts } = this.props;
+        if (!story.parts || story.parts.length === 0) {
+            return null;
+        }
         return (
             <ol>
             {
-                _.map(story.parts, (id, i) => {
-                    var part = _.get(parts, index);
+                story.parts.map((id, i) => {
+                    var part = (parts) ? parts[index] : null;
                     if (part) {
                         return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
                     } else {
@@ -104,7 +108,7 @@ class StoryViewSync extends PureComponent {
 
     renderCommentCount() {
         let { story } = this.props;
-        let count = _.size(story.kids);
+        let count = (story.kids) ? story.kids.length : 0;
         let label = `${count} comment` + (count === 1 ? '' : 's');
         let barProps = {
             className: 'comment-bar',

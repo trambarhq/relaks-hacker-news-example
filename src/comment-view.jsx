@@ -1,6 +1,8 @@
-import _ from 'lodash';
-import { default as React, PureComponent } from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'pure-component';
 import { CommentList } from 'comment-list';
+
+/** @jsx h */
 
 class CommentView extends PureComponent {
     static displayName = 'CommentView';
@@ -37,7 +39,7 @@ class CommentView extends PureComponent {
 
     renderReplies() {
         let { comment } = this.props;
-        if (!comment || _.isEmpty(comment.kids)) {
+        if (!comment || !comment.kids || comment.kids.length === 0) {
             return null;
         }
         let listProps = { commentIDs: comment.kids, replies: true };

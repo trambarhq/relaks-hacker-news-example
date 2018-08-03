@@ -1,7 +1,9 @@
-import { default as React, Component } from 'react';
+import { h, Component } from 'preact';
 import { StoryList } from 'story-list';
 
 import 'style.scss';
+
+/** @jsx h */
 
 class Application extends Component {
     static displayName = 'Application';
