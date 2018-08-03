@@ -15,11 +15,10 @@ class StoryView extends AsyncComponent {
             parts: null,
         };
         if (!_.isEmpty(story.parts)) {
-            console.log('Parts: ', story.parts);
             meanwhile.show(<StoryViewSync {...props} />);
             props.parts = await Promise.map(story.parts, (id) => {
                 return get(`/item/${id}.json`);
-            }, { concurrency: 5 });
+            });
         }
         return <StoryViewSync {...props} />;
     }
@@ -128,7 +127,9 @@ class StoryViewSync extends PureComponent {
         if (this.state.showingComments) {
             containerProps.className += ' open';
         } else {
-            containerProps.onTransitionEnd = this.handleTransitionEnd;
+            if (this.state.renderingComments) {
+                containerProps.onTransitionEnd = this.handleTransitionEnd;
+            }
         }
         return <div {...containerProps}>{comments}</div>;
     }

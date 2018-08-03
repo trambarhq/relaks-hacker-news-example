@@ -35,7 +35,7 @@ class StoryListSync extends PureComponent {
         return (
             <div className="story-list">
             {
-                _.map(stories, (story) => {
+                _.map(_.reject(stories, { deleted: true }), (story) => {
                     return <StoryView key={story.id} story={story} />;
                 })
             }

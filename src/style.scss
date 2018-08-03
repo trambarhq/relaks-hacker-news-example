@@ -22,7 +22,6 @@ BODY {
     top: 0;
     left: 0;
     right: 0;
-
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -35,6 +34,7 @@ BODY {
         text-align: center;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
+        box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.15);
     }
 
     .button {
@@ -82,6 +82,7 @@ BODY {
         overflow: hidden;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.20);
 
         .by {
             margin-left: 5px;
@@ -118,7 +119,7 @@ BODY {
         }
 
         .comment-list {
-
+            padding-left: 10px;
         }
 
         .comment {

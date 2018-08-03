@@ -18,7 +18,7 @@ class CommentList extends AsyncComponent {
         meanwhile.show(<CommentListSync {...props} />);
         let commentIDChunks = _.chunk(commentIDs, 5);
         await Promise.each(commentIDChunks, async (idChunk) => {
-            var comments = await Promise.map(idChunk, (id) => {
+            let comments = await Promise.map(idChunk, (id) => {
                 return get(`/item/${id}.json`);
             });
             props.comments = _.concat(props.comments, comments);
