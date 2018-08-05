@@ -63,6 +63,7 @@
     overflow-y: scroll;
     overflow-y: overlay;
     -ms-overflow-style: -ms-autohiding-scrollbar;
+    -webkit-overflow-scrolling: touch;
 
     @media screen and (max-width: 740px) {
         padding-top: 6em;
