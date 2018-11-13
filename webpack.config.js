@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var FS = require('fs');
 var Path = require('path');
 var Webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -28,15 +28,15 @@ module.exports = {
                 exclude: /node_modules/,
                 query: {
                     presets: [
-                        'babel-preset-es2015',
-                        'babel-preset-react',
-                        'babel-preset-stage-0',
-                        'babel-preset-stage-2',
+                        'env',
+                        'react',
+                        'stage-0',
                     ],
                     plugins: [
                         'syntax-async-functions',
                         'syntax-class-properties',
                         'transform-regenerator',
+                        'transform-runtime',
                     ]
                 }
             },
@@ -47,15 +47,9 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [
-                    {
-                        loader: 'style-loader'
-                    },
-                    {
-                        loader: 'css-loader'
-                    },
-                    {
-                        loader: 'sass-loader',
-                    }
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader',
                 ]
             },
             {
@@ -91,7 +85,6 @@ if (event === 'build') {
     var plugins = module.exports.plugins;
     var constants = {
         'process.env.NODE_ENV': '"production"',
-        'process.env.INCLUDE_DISPLAY_NAME': 'true'
     };
     plugins.unshift(new DefinePlugin(constants));
 
@@ -103,4 +96,10 @@ if (event === 'build') {
             }
         }
     }));
+}
+
+// copy webpack.resolve.js into webpack.debug.js to resolve Babel presets
+// and plugins to absolute paths, required when linked modules are used
+if (FS.existsSync('./webpack.debug.js')) {
+    require('./webpack.debug.js')(module.exports);
 }
