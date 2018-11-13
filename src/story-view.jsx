@@ -122,16 +122,17 @@ class StoryViewSync extends PureComponent {
 
     renderCommentList() {
         let { story } = this.props;
+        let { showingComments, renderingComments } = this.state;
         let comments;
-        if (this.state.renderingComments) {
+        if (renderingComments) {
             let listProps = { commentIDs: story.kids, replies: false };
             comments = <CommentList {...listProps} />;
         }
         let containerProps = { className: 'comment-container' };
-        if (this.state.showingComments) {
+        if (showingComments) {
             containerProps.className += ' open';
         } else {
-            if (this.state.renderingComments) {
+            if (renderingComments) {
                 containerProps.onTransitionEnd = this.handleTransitionEnd;
             }
         }
