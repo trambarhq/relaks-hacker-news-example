@@ -30,7 +30,7 @@ even sure if our approach is viable--assessing the API directly from the client-
 
 ## Application
 
-Per usual, **Application** ([application.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/application.jsx)) is the app's root node. It's a regular React component. Its `render()` method looks as follows:
+Per usual, `Application` ([application.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/application.jsx)) is the app's root node. It's a regular React component. Its `render()` method looks as follows:
 
 ```js
 render() {
@@ -44,11 +44,11 @@ render() {
 }
 ```
 
-Pretty standard React code. The method renders a nav bar and a the story list, which could be of different types ("top", "best", "job", etc.). One notable detail is the use of a key on **StoryList**. This will be addressed [later](#key-usage).
+Pretty standard React code. The method renders a nav bar and a the story list, which could be of different types ("top", "best", "job", etc.). One notable detail is the use of a key on `StoryList`. This will be addressed [later](#key-usage).
 
 ## Story list
 
-**StoryList** ([story-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. Its `renderAsync()` method is as follows:
+`StoryList` ([story-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. Its `renderAsync()` method is as follows:
 
 ```js
 async renderAsync(meanwhile) {
@@ -93,7 +93,7 @@ render() {
 
 ## Story View
 
-**StoryView** ([story-view.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
+`StoryView` ([story-view.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
 
 ```js
 async renderAsync(meanwhile) {
@@ -112,7 +112,7 @@ async renderAsync(meanwhile) {
 }
 ```
 
-The `render()` method of **StoryViewSync** ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx#L27)) looks like this:
+The `render()` method of `StoryViewSync` ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx#L27)) looks like this:
 
 ```js
 render() {
@@ -172,11 +172,11 @@ handleTransitionEnd = (evt) => {
 }
 ```
 
-When `state.renderingComments` becomes false, **CommentList** will unmount. If it's still in the middle of retrieving comments from the HN server, `meanwhile.show()` will throw an `AsyncRenderingInterrupted` exception. The promise returned by `Promise.each()` then immediately rejects, stopping any further data retrieval.
+When `state.renderingComments` becomes false, `CommentList` will unmount. If it's still in the middle of retrieving comments from the HN server, `meanwhile.show()` will throw an `AsyncRenderingInterrupted` exception. The promise returned by `Promise.each()` then immediately rejects, stopping any further data retrieval.
 
 ## Comment list
 
-`CommentList` ([comment-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like **StoryList**. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
+`CommentList` ([comment-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
 
 ```js
 let { commentIDs, replies } = this.props;
@@ -275,7 +275,7 @@ renderReplies() {
 
 ## Key usage
 
-Earlier, you saw the `render()` method of **Application**:
+Earlier, you saw the `render()` method of `Application`:
 
 ```js
 render() {
@@ -309,7 +309,7 @@ function TopStoryList(props) {
 
 ## Omitting Bluebird
 
-While Bluebird is a very handy tool, the library is fairly large. While size is not an issue for a working demo, eventually we might want to slim down the app and omit Bluebird.
+Bluebird is a very handy tool. The library is fairly large through. While size is not an issue for a working demo, eventually we might want to slim down the app and omit Bluebird.
 
 The following is a version of `StoryList`'s renderAsync() method without Bluebird or Lodash:
 
@@ -334,3 +334,11 @@ async renderAsync(meanwhile) {
 ```
 
 It's arguably somewhat easier to understand.
+
+## Preact version
+
+A Preact version of this example is available as the [`preact` branch of this project](https://github.com/chung-leong/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the app to 14KB (gzipped).
+
+## Final words
+
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. There's no update mechanism currently. That's probably something we'll implement in a future follow-up.
