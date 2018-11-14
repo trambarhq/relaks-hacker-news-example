@@ -4,6 +4,8 @@ The unopinionated nature of [Relaks](https://github.com/chung-leong/relaks) make
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
+![Screenshot](docs/img/screenshot.png)
+
 ## Data source
 
 The code for data retrieval is contained in [hacker-news.js](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/hacker-news.js). It's very primitive:
@@ -179,22 +181,24 @@ When `state.renderingComments` becomes false, `CommentList` will unmount. If it'
 `CommentList` ([comment-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
 
 ```js
-let { commentIDs, replies } = this.props;
-let props = {
-    comments: [],
-    commentIDs,
-    replies,
-};
-meanwhile.show(<CommentListSync {...props} />);
-let commentIDChunks = _.chunk(commentIDs, 5);
-await Promise.each(commentIDChunks, async (idChunk) => {
-    var comments = await Promise.map(idChunk, (id) => {
-        return get(`/item/${id}.json`);
-    });
-    props.comments = _.concat(props.comments, comments);
+async renderAsync(meanwhile) {
+    let { commentIDs, replies } = this.props;
+    let props = {
+        comments: [],
+        commentIDs,
+        replies,
+    };
     meanwhile.show(<CommentListSync {...props} />);
-});
-return <CommentListSync {...props} />;
+    let commentIDChunks = _.chunk(commentIDs, 5);
+    await Promise.each(commentIDChunks, async (idChunk) => {
+        let comments = await Promise.map(idChunk, (id) => {
+            return get(`/item/${id}.json`);
+        });
+        props.comments = _.concat(props.comments, comments);
+        meanwhile.show(<CommentListSync {...props} />);
+    });
+    return <CommentListSync {...props} />;
+}
 ```
 
 The `render()` method of `CommentListSync` ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx#L31)) works slightly differently:
@@ -341,4 +345,4 @@ A Preact version of this example is available as the [`preact` branch of this pr
 
 ## Final words
 
-As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. There's no update mechanism currently. That's probably something we'll implement in a future follow-up.
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is fast and easy. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React. 
