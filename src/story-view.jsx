@@ -85,7 +85,7 @@ class StoryViewSync extends PureComponent {
             <ol>
             {
                 _.map(story.parts, (id, i) => {
-                    var part = _.get(parts, index);
+                    let part = _.get(parts, index);
                     if (part) {
                         return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
                     } else {
@@ -150,7 +150,7 @@ class StoryViewSync extends PureComponent {
 }
 
 function HTML(props) {
-    var markup = { __html: props.markup };
+    let markup = { __html: props.markup };
     return <span dangerouslySetInnerHTML={markup} />;
 }
 

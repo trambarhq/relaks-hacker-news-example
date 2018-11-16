@@ -17,7 +17,7 @@ class StoryList extends AsyncComponent {
         let storyIDs = await get(`/${type}.json`);
         let storyIDChunks = _.chunk(storyIDs, 5);
         await Promise.each(storyIDChunks, async (idChunk) => {
-            var stories = await Promise.map(idChunk, (id) => {
+            let stories = await Promise.map(idChunk, (id) => {
                 return get(`/item/${id}.json`);
             });
             props.stories = _.concat(props.stories, stories);

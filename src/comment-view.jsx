@@ -50,7 +50,7 @@ class CommentView extends PureComponent {
 }
 
 function HTML(props) {
-    var markup = { __html: props.markup };
+    let markup = { __html: props.markup };
     return <span dangerouslySetInnerHTML={markup} />;
 }
 
