@@ -1,6 +1,6 @@
 # Relaks Hacker News Example
 
-The unopinionated nature of [Relaks](https://github.com/chung-leong/relaks) makes it especially useful during the prototyping phrase of application development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We won't put much thoughts into software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
+The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of application development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We won't put much thoughts into software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
@@ -8,7 +8,7 @@ The unopinionated nature of [Relaks](https://github.com/chung-leong/relaks) make
 
 ## Data source
 
-The code for data retrieval is contained in [hacker-news.js](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/hacker-news.js). It's very primitive:
+The code for data retrieval is contained in [hacker-news.js](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/hacker-news.js). It's very primitive:
 
 ```js
 import Memoizee from 'memoizee';
@@ -32,7 +32,7 @@ even sure if our approach is viable--assessing the API directly from the client-
 
 ## Application
 
-Per usual, `Application` ([application.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/application.jsx)) is the app's root node. It's a regular React component. Its `render()` method looks as follows:
+Per usual, `Application` ([application.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/application.jsx)) is the app's root node. It's a regular React component. Its `render()` method looks as follows:
 
 ```js
 render() {
@@ -50,7 +50,7 @@ Pretty standard React code. The method renders a nav bar and a the story list, w
 
 ## Story list
 
-`StoryList` ([story-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. Its `renderAsync()` method is as follows:
+`StoryList` ([story-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. Its `renderAsync()` method is as follows:
 
 ```js
 async renderAsync(meanwhile) {
@@ -76,7 +76,7 @@ We first retrieve a list of story IDs from Hacker News (e.g. [/topstories.json](
 
 `Promise.each()` and `Promise.map()` aren't standard method. They come from the excellent [Bluebird](http://bluebirdjs.com) library, which we're using to help orchestrate asynchronous operations.
 
-**StoryListSync**'s ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-list.jsx#L30)) `render()` method looks like this--nothing special:
+**StoryListSync**'s ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-list.jsx#L30)) `render()` method looks like this--nothing special:
 
 ```js
 render() {
@@ -95,7 +95,7 @@ render() {
 
 ## Story View
 
-`StoryView` ([story-view.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
+`StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
 
 ```js
 async renderAsync(meanwhile) {
@@ -114,7 +114,7 @@ async renderAsync(meanwhile) {
 }
 ```
 
-The `render()` method of `StoryViewSync` ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/story-view.jsx#L27)) looks like this:
+The `render()` method of `StoryViewSync` ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx#L27)) looks like this:
 
 ```js
 render() {
@@ -178,7 +178,7 @@ When `state.renderingComments` becomes false, `CommentList` will unmount. If it'
 
 ## Comment list
 
-`CommentList` ([comment-list.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
+`CommentList` ([comment-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
 
 ```js
 async renderAsync(meanwhile) {
@@ -201,7 +201,7 @@ async renderAsync(meanwhile) {
 }
 ```
 
-The `render()` method of `CommentListSync` ([same file](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-list.jsx#L31)) works slightly differently:
+The `render()` method of `CommentListSync` ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-list.jsx#L31)) works slightly differently:
 
 ```js
 render() {
@@ -226,7 +226,7 @@ Instead of loop through the list of comment objects, we loop through the list of
 
 ## Comment view
 
-`CommentView` ([comment-view.jsx](https://github.com/chung-leong/relaks-hacker-news-example/blob/master/src/comment-view.jsx)) is a normal React component. Its `render()` methods looks as follows:
+`CommentView` ([comment-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-view.jsx)) is a normal React component. Its `render()` methods looks as follows:
 
 ```js
 render() {
@@ -341,8 +341,8 @@ It's arguably somewhat easier to understand.
 
 ## Preact version
 
-A Preact version of this example is available as the [`preact` branch of this project](https://github.com/chung-leong/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the app to 14KB (gzipped).
+A Preact version of this example is available as the [`preact` branch of this project](https://github.com/trambarhq/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the app to 14KB (gzipped).
 
 ## Final words
 
-As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is fast and easy. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React. 
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is fast and easy. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.

@@ -1,7 +1,7 @@
 {
   "name": "prelaks-starwars-example",
   "version": "1.0.0",
-  "description": "An example of using Prelaks that retrieves data from swapi.co",
+  "description": "An example of using Relaks to create a Hacker News reader",
   "scripts": {
     "watch": "webpack --watch",
     "build": "webpack",
@@ -10,11 +10,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:chung-leong/prelaks-starwars-example.git"
+    "url": "git@github.com:trambarhq/relaks-hacker-news-example.git"
   },
   "author": "Chung Leong",
   "license": "MIT",
-  "homepage": "https://github.com/chung-leong/trambar-deco",
+  "homepage": "https://github.com/trambarhq/relaks-hacker-news-example",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
