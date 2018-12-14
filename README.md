@@ -6,6 +6,16 @@ The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes 
 
 ![Screenshot](docs/img/screenshot.png)
 
+* [Data source](#data-source)
+* [Application](#application)
+* [Story list](#story-list)
+* [Story view](#story-view)
+* [Comment list](#comment-list)
+* [Comment view](#comment-view)
+* [Key usage](#key-usage)
+* [Preact version](#preact-version)
+* [Next step](#next-step)
+
 ## Data source
 
 The code for data retrieval is contained in [hacker-news.js](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/hacker-news.js). It's very primitive:
@@ -93,7 +103,7 @@ render() {
 }
 ```
 
-## Story View
+## Story view
 
 `StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
 
@@ -337,12 +347,14 @@ async renderAsync(meanwhile) {
 }
 ```
 
-It's arguably somewhat easier to understand.
+That's arguably somewhat easier to understand. Perhaps it's time to drop this tool from the pre-ES7 days?
 
 ## Preact version
 
 A Preact version of this example is available as the [`preact` branch of this project](https://github.com/trambarhq/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the app to 14KB (gzipped).
 
-## Final words
+## Next step
 
 As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is fast and easy. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
+
+Where do we go from here? There's a couple short-comings that needs addressing. First, the page doesn't update itself when new stories are posted on Hacker News. Adding change notification would entail using the Firebase SDK. Second, the comment count currently only reflects top-level comments. In order to get the total number of comments (that is, including replies to comments) we would have to recursively fetch all comments. Clearly, we can't do that for all stories. Some kind of retrieve-on-scroll mechanism would be needed. We'll deal with these issues in a future example.
