@@ -56,7 +56,7 @@ render() {
 }
 ```
 
-Pretty standard React code. The method renders a nav bar and a the story list, which could be of different types ("top", "best", "job", etc.). One notable detail is the use of a key on `StoryList`. This will be addressed [later](#key-usage).
+Pretty standard React code. The method renders a nav bar and a story list, which could be of different types ("top", "best", "job", etc.). One notable detail is the use of a key on `StoryList`. This will be addressed [later](#key-usage).
 
 ## Story list
 
@@ -308,8 +308,8 @@ Why does it put a key on `StoryList`? That's done to keep React from reusing the
 Another problem is the scroll position. If the user has scrolled down prior to switching to a different story type, the new page could end up with the old scroll position. While you can force a scroll-to-top manually, the operation would not be in-sync with the redrawing of the page. Either the user will see very briefly the old page, or he will very briefly see the middle section of the new page.
 
 If the key is removed, the app would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `meanwhile.show()`. During the initial render cycle (i.e. right after the component mounts), Relaks gives the promise it receives from `renderAsync()` 50ms. Once the promise has resolved, the delay becomes infinity by default.
-Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has rendered fully is due to changes to the data that it uses as opposed to user action. If the user is unaware that an operation
-has started, then he cannot perceive it as slow. Progressive rendering no longer makes sense.
+Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has rendered fully is due to data changes as opposed to user action. If the user is unaware that an operation
+has commenced, then he cannot perceive it as slow. A component suddenly reverting from a complete state to an incomplete state just feels weird.
 
 While you can alter the delay with a call to `meanwhile.delay()`, forcing React to recreate the component is the superior solution.
 
@@ -355,6 +355,6 @@ A Preact version of this example is available as the [`preact` branch of this pr
 
 ## Next step
 
-As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is fast and easy. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is easy and quick. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
 
 Where do we go from here? There's a couple short-comings that needs addressing. First, the page doesn't update itself when new stories are posted on Hacker News. Adding change notification would entail using the Firebase SDK. Second, the comment count currently only reflects top-level comments. In order to get the total number of comments (that is, including replies to comments) we would have to recursively fetch all comments. Clearly, we can't do that for all stories. Some kind of retrieve-on-scroll mechanism would be needed. We'll deal with these issues in a future example.
