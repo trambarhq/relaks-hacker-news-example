@@ -4,7 +4,7 @@ The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes 
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
-![Screenshot](docs/img/screenshot.png)
+[![Screenshot](docs/img/screenshot.png)](https://trambar.io/examples/hacker-news/)
 
 * [Data source](#data-source)
 * [Application](#application)
