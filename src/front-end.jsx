@@ -5,8 +5,8 @@ import 'style.scss';
 
 /** @jsx h */
 
-class Application extends Component {
-    static displayName = 'Application';
+class FrontEnd extends Component {
+    static displayName = 'FrontEnd';
 
     constructor() {
         super();
@@ -79,4 +79,7 @@ function Button(props) {
     )
 }
 
-export { Application };
+export {
+    FrontEnd as default,
+    FrontEnd,
+};
