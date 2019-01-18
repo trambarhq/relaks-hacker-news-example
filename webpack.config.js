@@ -14,7 +14,7 @@ module.exports = {
     entry: './main',
     output: {
         path: Path.resolve('./www'),
-        filename: 'app.js',
+        filename: 'front-end.js',
     },
     resolve: {
         extensions: [ '.js', '.jsx' ],
