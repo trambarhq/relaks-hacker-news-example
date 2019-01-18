@@ -1,5 +1,5 @@
 {
-  "name": "prelaks-starwars-example",
+  "name": "relaks-hacker-news-example",
   "version": "1.0.0",
   "description": "An example of using Relaks to create a Hacker News reader",
   "scripts": {
@@ -35,7 +35,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "regenerator-runtime": "^0.12.0",
-    "relaks": "^1.1.7",
+    "relaks": "^1.1.8",
     "sass-loader": "^6.0.5",
     "style-loader": "^0.17.0",
     "uglifyjs-webpack-plugin": "^0.4.6",

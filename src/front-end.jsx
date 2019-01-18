@@ -3,8 +3,8 @@ import { StoryList } from 'story-list';
 
 import 'style.scss';
 
-class Application extends Component {
-    static displayName = 'Application';
+class FrontEnd extends Component {
+    static displayName = 'FrontEnd';
 
     constructor() {
         super();
@@ -77,4 +77,7 @@ function Button(props) {
     )
 }
 
-export { Application };
+export {
+    FrontEnd as default,
+    FrontEnd,
+};

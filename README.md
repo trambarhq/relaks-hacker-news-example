@@ -1,13 +1,13 @@
 # Relaks Hacker News Example
 
-The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of application development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We won't put much thoughts into software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
+The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We won't put much thoughts into software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
 [![Screenshot](docs/img/screenshot.png)](https://trambar.io/examples/hacker-news/)
 
 * [Data source](#data-source)
-* [Application](#application)
+* [FrontEnd](#frontend)
 * [Story list](#story-list)
 * [Story view](#story-view)
 * [Comment list](#comment-list)
@@ -40,15 +40,15 @@ even sure if our approach is viable--assessing the API directly from the client-
 
 `get()` is memoized so that we get the same promise for the same URI. It's a quick way of providing the caching that Relaks needs.
 
-## Application
+## FrontEnd
 
-Per usual, `Application` ([application.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/application.jsx)) is the app's root node. It's a regular React component. Its `render()` method looks as follows:
+Per usual, `FrontEnd` ([front-end.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/front-end.jsx)) is the front-end's root node. It's a regular React component. Its `render()` method looks as follows:
 
 ```js
 render() {
     let { storyType } = this.state;
     return (
-        <div className="application">
+        <div>
             {this.renderNavBar()}
             <StoryList key={storyType} type={storyType} />
         </div>
@@ -289,13 +289,13 @@ renderReplies() {
 
 ## Key usage
 
-Earlier, you saw the `render()` method of `Application`:
+Earlier, you saw the `render()` method of `FrontEnd`:
 
 ```js
 render() {
     let { storyType } = this.state;
     return (
-        <div className="application">
+        <div>
             {this.renderNavBar()}
             <StoryList key={storyType} type={storyType} />
         </div>
@@ -307,7 +307,7 @@ Why does it put a key on `StoryList`? That's done to keep React from reusing the
 
 Another problem is the scroll position. If the user has scrolled down prior to switching to a different story type, the new page could end up with the old scroll position. While you can force a scroll-to-top manually, the operation would not be in-sync with the redrawing of the page. Either the user will see very briefly the old page, or he will very briefly see the middle section of the new page.
 
-If the key is removed, the app would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `meanwhile.show()`. During the initial render cycle (i.e. right after the component mounts), Relaks gives the promise it receives from `renderAsync()` 50ms. Once the promise has resolved, the delay becomes infinity by default.
+If the key is removed, the front-end would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `meanwhile.show()`. During the initial render cycle (i.e. right after the component mounts), Relaks gives the promise it receives from `renderAsync()` 50ms. Once the promise has resolved, the delay becomes infinity by default.
 Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has rendered fully is due to data changes as opposed to user action. If the user is unaware that an operation
 has commenced, then he cannot perceive it as slow. A component suddenly reverting from a complete state to an incomplete state just feels weird.
 
@@ -323,7 +323,7 @@ function TopStoryList(props) {
 
 ## Omitting Bluebird
 
-Bluebird is a very handy tool. The library is fairly large through. While size is not an issue for a working demo, eventually we might want to slim down the app and omit Bluebird.
+Bluebird is a very handy tool. The library is fairly large through. While size is not an issue for a working demo, eventually we might want to slim down the front-end and omit Bluebird.
 
 The following is a version of `StoryList`'s renderAsync() method without Bluebird or Lodash:
 
@@ -351,10 +351,10 @@ That's arguably somewhat easier to understand. Perhaps it's time to drop this to
 
 ## Preact version
 
-A Preact version of this example is available as the [`preact` branch of this project](https://github.com/trambarhq/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the app to 14KB (gzipped).
+A Preact version of this example is available as the [`preact` branch of this project](https://github.com/trambarhq/relaks-hacker-news-example/tree/preact). You can see it in action [here](https://trambar.io/examples/hacker-news-preact/). Its WebPack report is [here](https://trambar.io/examples/hacker-news-preact/report.html). As you can see, after stripping out Bluebird and Lodash, we managed to shrink the front-end to 14KB (gzipped).
 
 ## Next step
 
-As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our app is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is easy and quick. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our front-end is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is easy and quick. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
 
 Where do we go from here? There's a couple short-comings that needs addressing. First, the page doesn't update itself when new stories are posted on Hacker News. Adding change notification would entail using the Firebase SDK. Second, the comment count currently only reflects top-level comments. In order to get the total number of comments (that is, including replies to comments) we would have to recursively fetch all comments. Clearly, we can't do that for all stories. Some kind of retrieve-on-scroll mechanism would be needed. We'll deal with these issues in a future example.
