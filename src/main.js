@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime';
 import 'preact/devtools';
 import { h, render } from 'preact';
 import { FrontEnd } from 'front-end';
