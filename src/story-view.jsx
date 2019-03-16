@@ -1,68 +1,55 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import { default as React, PureComponent } from 'react';
-import { AsyncComponent } from 'relaks';
+import React, { useState } from 'react';
+import Relaks, { useProgress } from 'relaks/hooks';
 import { CommentList } from 'comment-list';
 import { get } from 'hacker-news';
 
-class StoryView extends AsyncComponent {
-    static displayName = 'StoryView'
+var counts = {};
 
-    async renderAsync(meanwhile) {
-        let { story } = this.props;
-        let props = {
-            story: story,
-            parts: null,
-        };
-        if (!_.isEmpty(story.parts)) {
-            meanwhile.show(<StoryViewSync {...props} />);
-            props.parts = await Promise.map(story.parts, (id) => {
-                return get(`/item/${id}.json`);
-            });
+async function StoryView(props) {
+    const { story } = props;
+    const [ showingComments, showComments ] = useState(false);
+    const [ renderingComments, renderComments ] = useState(false);
+    const [ show ] = useProgress();
+    const parts = [];
+
+    render();
+    if (story.parts && story.parts.length > 0) {
+        const idChunk = story.parts;
+        const partChunk = await Promise.all(idChunk.map((id) => {
+            return get(`/item/${id}.json`);
+        }));
+        for (let part of partChunk) {
+            parts.push(part);
         }
-        return <StoryViewSync {...props} />;
-    }
-}
-
-class StoryViewSync extends PureComponent {
-    static displayName = 'StoryViewSync';
-
-    constructor() {
-        super();
-        this.state = {
-            open: false,
-        };
+        render();
     }
 
-    render() {
-        let { story } = this.props;
-        return (
+    function render() {
+        show(
             <div className="story-view">
                 <header>
                     {story.title} <span className="by">by {story.by}</span>
                 </header>
                 <section>
                     <div>
-                        {this.renderDecorativeImage()}
-                        {this.renderText()}
-                        {this.renderParts()}
-                        {this.renderURL()}
+                        {renderDecorativeImage()}
+                        {renderText()}
+                        {renderParts()}
+                        {renderURL()}
                     </div>
                 </section>
                 <footer>
-                    {this.renderCommentCount()}
-                    {this.renderCommentList()}
+                    {renderCommentCount()}
+                    {renderCommentList()}
                 </footer>
             </div>
         );
     }
 
-    renderDecorativeImage() {
-        let { story } = this.props;
-        let index = story.id % decorativeImages.length;
-        let image = decorativeImages[index];
-        let extra;
-        if (!_.trim(story.text) && !story.url && _.isEmpty(story.parts)) {
+    function renderDecorativeImage() {
+        const index = story.id % decorativeImages.length;
+        const image = decorativeImages[index];
+        if (!(story.text || '').trim() && !story.url && (!story.parts || story.parts.length === 0)) {
             return (
                 <span>
                     <img className="extra-decoration" src={extraDecorativeImage} />
@@ -74,87 +61,80 @@ class StoryViewSync extends PureComponent {
         }
     }
 
-    renderText() {
-        let { story } = this.props;
+    function renderText() {
         return <p><HTML markup={story.text} /></p>;
     }
 
-    renderParts() {
-        let { story, parts } = this.props;
-        return (
-            <ol>
-            {
-                _.map(story.parts, (id, i) => {
-                    let part = _.get(parts, index);
-                    if (part) {
-                        return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
-                    } else {
-                        return <li key={i} className="pending">...</li>;
-                    }
-                })
-            }
-            </ol>
-        );
+    function renderParts() {
+        if (!story.parts || story.parts.length === 0) {
+            return null;
+        }
+        return <ol>{story.parts.map(renderPart)}</ol>;
     }
 
-    renderURL() {
-        let { story } = this.props;
+    function renderPart(id, i) {
+        const part = (parts) ? parts[index] : null;
+        if (part) {
+            return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
+        } else {
+            return <li key={i} className="pending">...</li>;
+        }
+    }
+
+    function renderURL() {
         return <a href={story.url} target="_blank">{story.url}</a>;
     }
 
-    renderCommentCount() {
-        let { story } = this.props;
-        let count = _.size(story.kids);
-        let label = `${count} comment` + (count === 1 ? '' : 's');
-        let barProps = {
-            className: 'comment-bar',
-        };
+    function renderCommentCount() {
+        const count = (story.kids) ? story.kids.length : 0;
+        const label = `${count} comment` + (count === 1 ? '' : 's');
+        const classNames = [ 'comment-bar' ];
+        let onClick;
         if (count > 0) {
-            barProps.className += ' clickable';
-            barProps.onClick = this.handleCommentBarClick;
+            classNames.push('clickable');
+            onClick = (evt) => {
+                if (showingComments) {
+                    showComments(false);
+                } else {
+                    renderComments(true);
+                    showComments(true);
+                }
+            };
         }
-        return <div {...barProps}>{label}</div>;
+        return <div className={classNames.join(' ')} onClick={onClick}>{label}</div>;
     }
 
-    renderCommentList() {
-        let { story } = this.props;
-        let { showingComments, renderingComments } = this.state;
+    function renderCommentList() {
         let comments;
         if (renderingComments) {
-            let listProps = { commentIDs: story.kids, replies: false };
-            comments = <CommentList {...listProps} />;
+            comments = <CommentList commentIDs={story.kids} replies={false} />;
         }
-        let containerProps = { className: 'comment-container' };
+        const classNames = [ 'comment-container' ];
+        let onTransitionEnd
         if (showingComments) {
-            containerProps.className += ' open';
+            classNames.push('open');
         } else {
             if (renderingComments) {
-                containerProps.onTransitionEnd = this.handleTransitionEnd;
+                onTransitionEnd = (evt) => {
+                    console.log('transition end')
+                    renderComments(false);
+                };
             }
         }
-        return <div {...containerProps}>{comments}</div>;
-    }
-
-    handleCommentBarClick = (evt) => {
-        let { showingComments } = this.state;
-        if (showingComments) {
-            this.setState({ showingComments: false });
-        } else {
-            this.setState({ showingComments: true, renderingComments: true });
-        }
-    }
-
-    handleTransitionEnd = (evt) => {
-        this.setState({ renderingComments: false });
+        return (
+            <div className={classNames.join(' ')} onTransitionEnd={onTransitionEnd}>
+                {comments}
+            </div>
+        );
     }
 }
 
 function HTML(props) {
-    let markup = { __html: props.markup };
+    const markup = { __html: props.markup };
     return <span dangerouslySetInnerHTML={markup} />;
 }
 
-let decorativeImages = [
+const decorativeImages = [
     require('../img/kitty-1.png'),
     require('../img/kitty-2.png'),
     require('../img/kitty-3.png'),
@@ -163,6 +143,10 @@ let decorativeImages = [
     require('../img/kitty-6.png'),
     require('../img/kitty-7.png'),
 ];
-let extraDecorativeImage = require('../img/kitty-8.png');
+const extraDecorativeImage = require('../img/kitty-8.png');
 
-export { StoryView, StoryViewSync };
+const component = Relaks(StoryView);
+
+export { 
+    component as StoryView
+};

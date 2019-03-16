@@ -1,12 +1,16 @@
-import Memoizee from 'memoizee';
-
 const baseURL = 'https://hacker-news.firebaseio.com/v0'
+const cache = {};
 
-let get = Memoizee(async function(uri) {
-    let url = baseURL + uri;
-    let response = await window.fetch(url);
-    let result = await response.json();
+async function get(uri) {
+	let result = cache[uri];
+	if (!result) {
+	    const url = baseURL + uri;
+	    const response = await window.fetch(url);
+	    result = cache[uri] = await response.json();
+	}
     return result;
-});
+}
 
-export { get };
+export { 
+	get 
+};

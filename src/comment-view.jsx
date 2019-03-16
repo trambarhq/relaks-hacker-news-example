@@ -1,49 +1,44 @@
-import _ from 'lodash';
-import { default as React, PureComponent } from 'react';
+import React from 'react';
 import { CommentList } from 'comment-list';
 
-class CommentView extends PureComponent {
-    static displayName = 'CommentView';
-
-    render() {
-        let { comment, reply } = this.props;
-        let iconClass = 'fa-heart ' + (reply ? 'far' : 'fas');
-        let author, text;
-        if (comment) {
-            if (!comment.deleted) {
-                author = `${comment.by}:`;
-                text = <HTML markup={comment.text} />;
-            } else {
-                iconClass = 'fa-sad-tear fas';
-                author = '[deleted]';
-            }
+function CommentView(props) {
+    const { comment, reply } = props;
+    const iconClassNames = [ 'fa-heart', (reply) ? 'far' : 'fas' ];
+    let author, text;
+    if (comment) {
+        if (!comment.deleted) {
+            author = `${comment.by}:`;
+            text = <HTML markup={comment.text} />;
         } else {
-            author = <span className="pending">...</span>;
-            text = '\u00a0';
+            iconClassNames[0] = 'fa-sad-tear';
+            author = '[deleted]';
+            console.log()
         }
-        return (
-            <div className="comment">
-                <div className="icon">
-                    <i className={iconClass} />
-                </div>
-                <div className="contents">
-                    <div className="by">{author}</div>
-                    <div className="text">{text}</div>
-                    {this.renderReplies()}
-                </div>
-            </div>
-        );
+    } else {
+        author = <span className="pending">...</span>;
+        text = '\u00a0';
     }
 
-    renderReplies() {
-        let { comment } = this.props;
-        if (!comment || _.isEmpty(comment.kids)) {
+    return (
+        <div className="comment">
+            <div className="icon">
+                <i className={iconClassNames.join(' ')} />
+            </div>
+            <div className="contents">
+                <div className="by">{author}</div>
+                <div className="text">{text}</div>
+                {renderReplies()}
+            </div>
+        </div>
+    );
+
+    function renderReplies() {
+        if (!comment || !comment.kids || !comment.kids.length) {
             return null;
         }
-        let listProps = { commentIDs: comment.kids, replies: true };
         return (
             <div className="replies">
-                <CommentList {...listProps} />
+                <CommentList commentIDs={comment.kids} replies={true} />
             </div>
         );
     }
@@ -54,4 +49,6 @@ function HTML(props) {
     return <span dangerouslySetInnerHTML={markup} />;
 }
 
-export { CommentView };
+export { 
+    CommentView 
+};

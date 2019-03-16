@@ -1,47 +1,44 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import { default as React, PureComponent } from 'react';
-import { AsyncComponent } from 'relaks';
+import React from 'react';
+import Relaks, { useProgress } from 'relaks/hooks';
 import { StoryView } from 'story-view';
 import { get } from 'hacker-news';
 
-class StoryList extends AsyncComponent {
-    static displayName = 'StoryList';
+async function StoryList(props) {
+    const { type } = props;
+    const [ show ] = useProgress();
+    const stories = [];
 
-    async renderAsync(meanwhile) {
-        let { type } = this.props;
-        let props = {
-            stories: [],
-        };
-        meanwhile.show(<StoryListSync {...props} />);
-        let storyIDs = await get(`/${type}.json`);
-        let storyIDChunks = _.chunk(storyIDs, 5);
-        await Promise.each(storyIDChunks, async (idChunk) => {
-            let stories = await Promise.map(idChunk, (id) => {
-                return get(`/item/${id}.json`);
-            });
-            props.stories = _.concat(props.stories, stories);
-            meanwhile.show(<StoryListSync {...props} />);
-        });
-        return <StoryListSync {...props} />;
+    render();
+    const storyIDs = await get(`/${type}.json`);
+    for (let i = 0, n = 5; i < storyIDs.length; i += n) {
+        const idChunk = storyIDs.slice(i, i + n);
+        const storyChunk = await Promise.all(idChunk.map(async (id) => {
+            return get(`/item/${id}.json`);
+        }));
+        for (let story of storyChunk) {
+            stories.push(story);
+        }
+        render();
     }
-}
 
-class StoryListSync extends PureComponent {
-    static displayName = 'StoryListSync';
-
-    render() {
-        let { stories } = this.props;
-        return (
+    function render() {
+        show(
             <div className="story-list">
-            {
-                _.map(_.reject(stories, { deleted: true }), (story) => {
-                    return <StoryView key={story.id} story={story} />;
-                })
-            }
+                {stories.map(renderStory)}
             </div>
         );
     }
+
+    function renderStory(story, i) {
+        if (story.deleted) {
+            return null;
+        }
+        return <StoryView story={story} key={story.id} />;
+    }
 }
 
-export { StoryList, StoryListSync };
+const component = Relaks(StoryList);
+
+export { 
+    component as StoryList 
+};

@@ -1,52 +1,40 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import { default as React, PureComponent } from 'react';
-import { AsyncComponent } from 'relaks';
+import React from 'react';
+import Relaks, { useProgress } from 'relaks/hooks';
 import { CommentView } from 'comment-view';
 import { get } from 'hacker-news';
 
-class CommentList extends AsyncComponent {
-    static displayName = 'CommentList';
+async function CommentList(props) {
+    const { commentIDs, replies } = props;
+    const [ show ] = useProgress();
+    const comments = [];
 
-    async renderAsync(meanwhile) {
-        let { commentIDs, replies } = this.props;
-        let props = {
-            comments: [],
-            commentIDs,
-            replies,
-        };
-        meanwhile.show(<CommentListSync {...props} />);
-        let commentIDChunks = _.chunk(commentIDs, 5);
-        await Promise.each(commentIDChunks, async (idChunk) => {
-            let comments = await Promise.map(idChunk, (id) => {
-                return get(`/item/${id}.json`);
-            });
-            props.comments = _.concat(props.comments, comments);
-            meanwhile.show(<CommentListSync {...props} />);
-        });
-        return <CommentListSync {...props} />;
+    render();
+    for (let i = 0, n = 5; i < commentIDs.length; i += n) {
+        const idChunk = commentIDs.slice(i, i + n);
+        const commentChunk = await Promise.all(idChunk.map(async (id) => {
+            return get(`/item/${id}.json`);
+        }));
+        for (let comment of commentChunk) {
+            comments.push(comment);            
+        }
+        render();
     }
-}
 
-class CommentListSync extends PureComponent {
-    static displayName = 'CommentListSync';
-
-    render() {
-        let { commentIDs, comments, replies } = this.props;
-        return (
+    function render() {
+        show(
             <div className="comment-list">
-            {
-                _.map(commentIDs, (commentID, index) => {
-                    let commentProps = {
-                        comment: comments[index],
-                        reply: replies
-                    };
-                    return <CommentView key={commentID} {...commentProps} />;
-                })
-            }
+                {commentIDs.map(renderComment)}
             </div>
         );
     }
+
+    function renderComment(commentID, i) {
+        return <CommentView key={commentID} comment={comments[i]} reply={replies} />;
+    }
 }
 
-export { CommentList, CommentListSync };
+const component = Relaks(CommentList);
+
+export { 
+    component as CommentList, 
+};
