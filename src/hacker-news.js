@@ -2,15 +2,18 @@ const baseURL = 'https://hacker-news.firebaseio.com/v0'
 const cache = {};
 
 async function get(uri) {
-	let result = cache[uri];
-	if (!result) {
-	    const url = baseURL + uri;
-	    const response = await window.fetch(url);
-	    result = cache[uri] = await response.json();
+	let promise = cache[uri];
+	if (!promise) {
+	    promise = cache[uri] = fetchJSON(baseURL + uri);
 	}
-    return result;
+    return promise;
 }
 
-export { 
-	get 
+async function fetchJSON(url) {
+	const response = await fetch(url);
+	return response.json();
+}
+
+export {
+	get
 };

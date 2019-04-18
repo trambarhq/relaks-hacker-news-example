@@ -39,6 +39,6 @@ async function StoryList(props) {
 
 const component = Relaks.memo(StoryList);
 
-export { 
-    component as StoryList 
+export {
+    component as StoryList
 };

@@ -116,7 +116,6 @@ async function StoryView(props) {
         } else {
             if (renderingComments) {
                 onTransitionEnd = (evt) => {
-                    console.log('transition end')
                     renderComments(false);
                 };
             }
@@ -147,6 +146,6 @@ const extraDecorativeImage = require('../img/kitty-8.png');
 
 const component = Relaks.memo(StoryView);
 
-export { 
+export {
     component as StoryView
 };

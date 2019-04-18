@@ -12,7 +12,6 @@ function CommentView(props) {
         } else {
             iconClassNames[0] = 'fa-sad-tear';
             author = '[deleted]';
-            console.log()
         }
     } else {
         author = <span className="pending">...</span>;
@@ -49,6 +48,6 @@ function HTML(props) {
     return <span dangerouslySetInnerHTML={markup} />;
 }
 
-export { 
-    CommentView 
+export {
+    CommentView
 };

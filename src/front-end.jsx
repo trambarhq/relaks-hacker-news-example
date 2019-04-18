@@ -57,6 +57,5 @@ function Button(props) {
 }
 
 export {
-    FrontEnd as default,
     FrontEnd,
 };

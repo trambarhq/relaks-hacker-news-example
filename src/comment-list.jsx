@@ -15,7 +15,7 @@ async function CommentList(props) {
             return get(`/item/${id}.json`);
         }));
         for (let comment of commentChunk) {
-            comments.push(comment);            
+            comments.push(comment);
         }
         render();
     }
@@ -35,6 +35,6 @@ async function CommentList(props) {
 
 const component = Relaks.memo(CommentList);
 
-export { 
-    component as CommentList, 
+export {
+    component as CommentList,
 };

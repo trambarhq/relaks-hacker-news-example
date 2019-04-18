@@ -12,7 +12,7 @@ module.exports = {
     entry: './main',
     output: {
         path: Path.resolve('./www'),
-        filename: 'front-end.js',        
+        filename: 'front-end.js',
     },
     resolve: {
         extensions: [ '.js', '.jsx' ],
@@ -32,7 +32,6 @@ module.exports = {
                     ],
                     plugins: [
                         'syntax-async-functions',
-                        'syntax-class-properties',
                         'transform-regenerator',
                         'transform-runtime',
                     ]
