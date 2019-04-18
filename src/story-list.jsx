@@ -1,5 +1,5 @@
 import React from 'react';
-import Relaks, { useProgress } from 'relaks/hooks';
+import Relaks, { useProgress } from 'relaks';
 import { StoryView } from 'story-view';
 import { get } from 'hacker-news';
 
@@ -37,7 +37,7 @@ async function StoryList(props) {
     }
 }
 
-const component = Relaks(StoryList);
+const component = Relaks.memo(StoryList);
 
 export { 
     component as StoryList 

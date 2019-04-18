@@ -1,5 +1,5 @@
 import React from 'react';
-import Relaks, { useProgress } from 'relaks/hooks';
+import Relaks, { useProgress } from 'relaks';
 import { CommentView } from 'comment-view';
 import { get } from 'hacker-news';
 
@@ -33,7 +33,7 @@ async function CommentList(props) {
     }
 }
 
-const component = Relaks(CommentList);
+const component = Relaks.memo(CommentList);
 
 export { 
     component as CommentList, 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Relaks, { useProgress } from 'relaks/hooks';
+import Relaks, { useProgress } from 'relaks';
 import { CommentList } from 'comment-list';
 import { get } from 'hacker-news';
 
@@ -145,7 +145,7 @@ const decorativeImages = [
 ];
 const extraDecorativeImage = require('../img/kitty-8.png');
 
-const component = Relaks(StoryView);
+const component = Relaks.memo(StoryView);
 
 export { 
     component as StoryView
