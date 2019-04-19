@@ -1,10 +1,12 @@
 # Relaks Hacker News Example
 
-The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We won't put much thoughts into software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
+The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We don't want to time on software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
 [![Screenshot](docs/img/screenshot.png)](https://trambar.io/examples/hacker-news/)
+
+(In case you're wondering: Yes, the UI is meant as a joke :-)
 
 ## Data source
 
@@ -32,12 +34,11 @@ export {
 };
 ```
 
-As you can see, all we have is a function (rather poorly named) that retrieves a JSON object from Hacker News. We aren't terribly familiar with the [Hacker News API](https://github.com/HackerNews/API) at this point. We aren't
-even sure if our approach is viable--assessing the API directly from the client-side could conceivably be too slow. It doesn't make sense to try to build something sophisticated.
+Just a function (rather poorly named) that retrieves a JSON object from Hacker News. We aren't familiar with the [Hacker News API](https://github.com/HackerNews/API) at this point. We aren't even sure if our approach is viable. Conceivably, assessing the API directly from the client-side might be too slow. It doesn't make sense therefore to build something sophisticated.
 
 ## FrontEnd
 
-Per usual, `FrontEnd` ([front-end.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/front-end.jsx)) is the front-end's root node. It's a regular React component. Its `render()` method looks as follows:
+Per usual, `FrontEnd` ([front-end.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/front-end.jsx)) is the front-end's root node. It's a regular React component. Its source code is listed below:
 
 ```javascript
 import React, { useState } from 'react';
@@ -107,7 +108,7 @@ Pretty standard React code. The method renders a nav bar and a story list, which
 
 ## StoryList
 
-`StoryList` ([story-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. Its `renderAsync()` method is as follows:
+`StoryList` ([story-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-list.jsx)) is a Relaks component. It uses the `useProgress` hook to perform progressive rendering. It accepts `type` as a prop and retrieves stories of that type from HN.
 
 ```javascript
 import React from 'react';
@@ -156,19 +157,11 @@ export {
 };
 ```
 
-We first retrieve a list of story IDs from Hacker News (e.g. [/topstories.json](https://hacker-news.firebaseio.com/v0/topstories.json)). The list can contain upwards of 500 IDs. The API only permits the retrieval of a single story at a time. We obviously don't want to wait for 500 HTTP requests to complete before showing something. So we break the list into chunks of five and ask for redraw after each chunk is fetched.
-
-`Promise.each()` and `Promise.map()` aren't standard method. They come from the excellent [Bluebird](http://bluebirdjs.com) library, which we're using to help orchestrate asynchronous operations.
-
-**StoryListSync**'s ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-list.jsx#L30)) `render()` method looks like this--nothing special:
-
-```javascript
-/* ... */
-```
+We first retrieve a list of story IDs (e.g. [/topstories.json](https://hacker-news.firebaseio.com/v0/topstories.json)). The list can contain upwards of 500 IDs. The API only permits the retrieval of a single story at a time. We obviously don't want to wait for 500 HTTP requests to finish before showing something. So we break the list into chunks of five and ask for redraw after each chunk is fetched.
 
 ## StoryView
 
-`StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is a Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. Here's its `renderAsync()` method:
+`StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is another Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. That only occupies a small part of its code though. The rest is standard React UI code.
 
 ```javascript
 import React, { useState } from 'react';
@@ -324,13 +317,7 @@ export {
 };
 ```
 
-The `render()` method of `StoryViewSync` ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx#L27)) looks like this:
-
-```javascript
-/* ... */
-```
-
-The code should be self-explanatory. Of the helper methods, `renderCommentList()` is the one that contains more than formatting code:
+The code above should be largely self-explanatory. Of the helper functions, `renderCommentList()` is the only one that might require a closer look:
 
 ```javascript
     function renderCommentList() {
@@ -357,13 +344,11 @@ The code should be self-explanatory. Of the helper methods, `renderCommentList()
     }
 ```
 
-Comments are not shown initially. They appear when the user clicks on the bar. Two state variables are used to track this: `showingComments` and `renderingComments`. The second one is needed due to transition effect. We have to continue to render `CommentList` while the container div is collapsing. It's only after the transition has finished (the div having a height of 0) can we stop rendering it.
+Comments are not shown initially. They appear when the user clicks on the bar. Two state variables are used to track this: `showingComments` and `renderingComments`. The second one is needed due to transition effect. We have to continue to render `CommentList` while the container div is collapsing. Only after the transition has ended can we stop rendering it.
 
-When `state.renderingComments` becomes false, `CommentList` will unmount. If it's still in the middle of retrieving comments from the HN server, `meanwhile.show()` will throw an `AsyncRenderingInterrupted` exception. The promise returned by `Promise.each()` then immediately rejects, stopping any further data retrieval.
+## CommentList
 
-## Comment list
-
-`CommentList` ([comment-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting from the other class. Here's its `renderAsync()` method:
+`CommentList` ([comment-list.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-list.jsx)) functions largely like `StoryList`. Its code was, in fact, created by copy-and-pasting. The component receives `commentIDs` and `replies` as props. The latter is a boolean that indicates whether the list contains replies to comments. `StoryView` sets this to `false`.
 
 ```javascript
 import React from 'react';
@@ -408,17 +393,11 @@ export {
 };
 ```
 
-The `render()` method of `CommentListSync` ([same file](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-list.jsx#L31)) works slightly differently:
-
-```javascript
-/* ... */
-```
-
-Instead of loop through the list of comment objects, we loop through the list of comment IDs. This allows us to draw placeholders for the comments while they're loading.
+The rendering code is slightly different here. Instead of loop through the list of comment objects, we loop through the list of comment IDs. This allows us to draw placeholders for the comments while they're loading.
 
 ## CommentView
 
-`CommentView` ([comment-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-view.jsx)) is a normal React component. Its `render()` methods looks as follows:
+`CommentView` ([comment-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/comment-view.jsx)) is a normal React component. It receives `comment` and `reply` as props. The latter indicates whether the comment is a reply to a comment.
 
 ```javascript
 import React from 'react';
@@ -491,31 +470,24 @@ A comment can have replies. `renderReplies()` draws them by creating an instance
     }
 ```
 
+And that's it!
+
 ## Key usage
 
-Earlier, you saw the `render()` method of `FrontEnd`:
+Earlier, you `FrontEnd` rendering `StoryList` with a key:
 
 ```javascript
     <StoryList key={storyType} type={storyType} />
 ```
 
-Why does it put a key on `StoryList`? That's done to keep React from reusing the component when the story type changes. As the lists contain largely different sets of stories, it doesn't make sense to reuse the component. React will just ending up wasting time performing a diff of the component's children.
+That's done to keep React from reusing the component when the story type changes. As the lists contain largely different sets of stories, it doesn't make sense to reuse the component. React will just end up wasting time diffing the component's children.
 
-Another problem is the scroll position. If the user has scrolled down prior to switching to a different story type, the new page could end up with the old scroll position. While you can force a scroll-to-top manually, the operation would not be in-sync with the redrawing of the page. Either the user will see very briefly the old page, or he will very briefly see the middle section of the new page.
+Another problem is the scroll position. If the user has scrolled down prior to switching to a different story type, the new page would end up with the old scroll position. While you can force a scroll-to-top manually, the operation would not be in-sync with the redrawing of the page. Either the user will see very briefly the old page, or he will very briefly see the middle section of the new page.
 
-If the key is removed, the front-end would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `meanwhile.show()`. During the initial render cycle (i.e. right after the component mounts), Relaks gives the promise it receives from `renderAsync()` 50ms. Once the promise has resolved, the delay becomes infinity by default.
-Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has rendered fully is due to data changes as opposed to user action. If the user is unaware that an operation
-has commenced, then he cannot perceive it as slow. A component suddenly reverting from a complete state to an incomplete state just feels weird.
+If the key is removed, the front-end would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `show()`. During the initial render cycle (i.e. right after the component mounts), asynchronous operations have 50ms to complete before progressive rendering kicks in. Once the component renders fully, the delay becomes `infinity` by default.
+Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has fully rendered is due to data changes as opposed to user action. The user has no clue when that happens so progressive rendering isn't necessary--if you don't know when an operation has commenced, you can't tell that happens slowly or quickly. Besides, a component suddenly reverting from a complete state to an incomplete state just feels weird.
 
-While you can alter the delay with a call to `meanwhile.delay()`, forcing React to recreate the component is the superior solution.
-
-An alternative to using a key would be to create wrapper component type for each story type:
-
-```javascript
-function TopStoryList(props) {
-    return <StoryList type="topstories" {...props} />;
-}
-```
+While you can give a different delay to `useProgress`, starting afresh whenever the story type changes makes better sense.
 
 ## Next step
 
