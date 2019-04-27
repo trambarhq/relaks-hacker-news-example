@@ -1,6 +1,6 @@
 # Relaks Hacker News Example
 
-The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We don't want to time on software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
+The unopinionated nature of [Relaks](https://github.com/trambarhq/relaks) makes it especially useful during the prototyping phrase of development. In this example, we're going to build a quick-and-dirty [Hacker News](https://news.ycombinator.com/) reader. We don't want to spend time on software architecture. We just want a working demo to show people. The focus will be squarely on the user interface.
 
 [Here's the end result](https://trambar.io/examples/hacker-news/).
 
@@ -30,11 +30,11 @@ async function fetchJSON(url) {
 }
 
 export {
-	get
+    get
 };
 ```
 
-Just a function (rather poorly named) that retrieves a JSON object from Hacker News. We aren't familiar with the [Hacker News API](https://github.com/HackerNews/API) at this point. We aren't even sure if our approach is viable. Conceivably, assessing the API directly from the client-side might be too slow. It doesn't make sense therefore to build something sophisticated.
+Just a function (rather poorly named) that retrieves a JSON object from Hacker News. We aren't familiar with the [Hacker News API](https://github.com/HackerNews/API) at this point. We aren't even sure if our approach is viable. Conceivably, assessing the API directly from the client side might be too slow. It doesn't make sense therefore to build something sophisticated.
 
 ## FrontEnd
 
@@ -161,7 +161,7 @@ We first retrieve a list of story IDs (e.g. [/topstories.json](https://hacker-ne
 
 ## StoryView
 
-`StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is another Relaks component. Async handling is needed because poll stories have additional parts that needs to be downloaded. That only occupies a small part of its code though. The rest is standard React UI code.
+`StoryView` ([story-view.jsx](https://github.com/trambarhq/relaks-hacker-news-example/blob/master/src/story-view.jsx)) is another Relaks component. Async handling is needed because poll stories have additional parts that need to be downloaded. That only occupies a small part of its code though. The rest is standard React UI code.
 
 ```javascript
 import React, { useState } from 'react';
@@ -317,7 +317,7 @@ export {
 };
 ```
 
-The code above should be largely self-explanatory. Of the helper functions, `renderCommentList()` is the only one that might require a closer look:
+The code above should be largely self-explanatory. Of the helper functions, `renderCommentList()` is the only one that warrants a closer look:
 
 ```javascript
     function renderCommentList() {
@@ -474,23 +474,24 @@ And that's it!
 
 ## Key usage
 
-Earlier, you `FrontEnd` rendering `StoryList` with a key:
+Earlier you saw `FrontEnd` rendering `StoryList` with a key:
 
 ```javascript
     <StoryList key={storyType} type={storyType} />
 ```
 
-That's done to keep React from reusing the component when the story type changes. As the lists contain largely different sets of stories, it doesn't make sense to reuse the component. React will just end up wasting time diffing the component's children.
+That's done to keep React from reusing the component when the story type changes. As the lists contain different sets of stories, it doesn't make sense to reuse the component. React will just end up wasting time diffing the component's children.
 
 Another problem is the scroll position. If the user has scrolled down prior to switching to a different story type, the new page would end up with the old scroll position. While you can force a scroll-to-top manually, the operation would not be in-sync with the redrawing of the page. Either the user will see very briefly the old page, or he will very briefly see the middle section of the new page.
 
-If the key is removed, the front-end would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `show()`. During the initial render cycle (i.e. right after the component mounts), asynchronous operations have 50ms to complete before progressive rendering kicks in. Once the component renders fully, the delay becomes `infinity` by default.
-Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has fully rendered is due to data changes as opposed to user action. The user has no clue when that happens so progressive rendering isn't necessary--if you don't know when an operation has commenced, you can't tell that happens slowly or quickly. Besides, a component suddenly reverting from a complete state to an incomplete state just feels weird.
+If the key is removed, the front-end would in fact start to malfunction much more seriously. After a page fully loads, the nav bar would cease to work seemingly. This behavior is due to the way Relaks defers rendering elements passed to `show()`. During the initial render cycle (i.e. right after the component mounts), asynchronous operations have 50ms to complete before progressive rendering kicks in. Once the component renders fully, the delay becomes `infinity` by default. Progressive rendering is turned off, in effect. The assumption is that any rerendering after a component has fully rendered is due to data changes as opposed to user action. The user has no clue when that happens so progressive rendering isn't necessary--if you don't know when an operation begins, you can't tell whether it happens slowly or quickly. Besides, a component suddenly reverting from a complete state to an incomplete state just feels weird.
 
 While you can give a different delay to `useProgress`, starting afresh whenever the story type changes makes better sense.
 
 ## Next step
 
-As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our front-end is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling. Building a front-end using Relaks is easy and quick. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
+As a proof-of-concept, this example managed to exceed expectations. Hacker News' API turns out to be very fast. Even from across the Atlantic, our front-end is quite responsive. Building it didn't take long--half a day or so. The majority of the time was spent on page layout and CSS styling.
 
-Where do we go from here? There's a couple short-comings that needs addressing. First, the page doesn't update itself when new stories are posted on Hacker News. Adding change notification would entail using the Firebase SDK. Second, the comment count currently only reflects top-level comments. In order to get the total number of comments (that is, including replies to comments) we would have to recursively fetch all comments. Clearly, we can't do that for all stories. Some kind of retrieve-on-scroll mechanism would be needed. We'll deal with these issues in a future example.
+Building a front-end using Relaks is easy and quick. There's no new concepts to digest. All that's required is a strong command of the JavaScript asynchronous model and React.
+
+Where do we go from here? There's a couple short-comings that need addressing. First, the page doesn't update itself when new stories are posted on Hacker News. Adding change notification would entail using the Firebase SDK. Second, the comment count currently only reflects top-level comments. In order to get the total number of comments (that is, including replies to comments) we would have to recursively fetch all comments. Clearly, we can't do that for all stories. Some kind of retrieve-on-scroll mechanism would be needed. We'll deal with these issues in a future example.
