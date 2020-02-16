@@ -1,9 +1,9 @@
 import { Component } from 'preact';
 
 export class PureComponent extends Component {
-    shouldComponentUpdate(props, state) {
-        return !(shallowEqual(props, this.props) && shallowEqual(state, this.state));
-    }
+  shouldComponentUpdate(props, state) {
+    return !(shallowEqual(props, this.props) && shallowEqual(state, this.state));
+  }
 }
 
 function shallowEqual(a, b) {

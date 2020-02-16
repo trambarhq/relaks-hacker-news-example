@@ -1,11 +1,11 @@
 import 'preact/devtools';
 import { h, render } from 'preact';
-import { FrontEnd } from 'front-end';
+import { FrontEnd } from './front-end.jsx';
 
 window.addEventListener('load', initialize);
 
 function initialize(evt) {
-    let container = document.getElementById('react-container');
-    let element = h(FrontEnd);
-    render(element, container);
+  const container = document.getElementById('react-container');
+  const element = h(FrontEnd);
+  render(element, container);
 }
