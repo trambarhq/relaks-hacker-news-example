@@ -17,20 +17,20 @@ const baseURL = 'https://hacker-news.firebaseio.com/v0'
 const cache = {};
 
 async function get(uri) {
-	let promise = cache[uri];
-	if (!promise) {
-	    promise = cache[uri] = fetchJSON(baseURL + uri);
-	}
-    return promise;
+  let promise = cache[uri];
+  if (!promise) {
+    promise = cache[uri] = fetchJSON(baseURL + uri);
+  }
+  return promise;
 }
 
 async function fetchJSON(url) {
-	const response = await fetch(url);
-	return response.json();
+  const response = await fetch(url);
+  return response.json();
 }
 
 export {
-    get
+  get
 };
 ```
 
@@ -47,60 +47,60 @@ import { StoryList } from 'story-list';
 import 'style.scss';
 
 function FrontEnd(props) {
-    const [ storyType, setStoryType ] = useState(localStorage.storyType || 'topstories');
+  const [ storyType, setStoryType ] = useState(localStorage.storyType || 'topstories');
 
-    const handleClick = (evt) => {
-        const target = evt.currentTarget;
-        const type =  target.getAttribute('data-value');
-        setStoryType(type);
-        localStorage.storyType = type;
-    };
+  const handleClick = (evt) => {
+    const target = evt.currentTarget;
+    const type =  target.getAttribute('data-value');
+    setStoryType(type);
+    localStorage.storyType = type;
+  };
 
-    return (
-        <div className="application">
-            <div className="nav-bar">
-                <div className="contents">
-                    <Button value="topstories" selected={storyType} onClick={handleClick}>
-                        Top Stories
-                    </Button>
-                    <Button value="beststories" selected={storyType} onClick={handleClick}>
-                        Best Stories
-                    </Button>
-                    <Button value="askstories" selected={storyType} onClick={handleClick}>
-                        Ask Stories
-                    </Button>
-                    <Button value="showstories" selected={storyType} onClick={handleClick}>
-                        Show Stories
-                    </Button>
-                    <Button value="jobstories" selected={storyType} onClick={handleClick}>
-                        Job Stories
-                    </Button>
-                </div>
-            </div>
-            <StoryList key={storyType} type={storyType} />
+  return (
+    <div className="application">
+      <div className="nav-bar">
+        <div className="contents">
+          <Button value="topstories" selected={storyType} onClick={handleClick}>
+            Top Stories
+          </Button>
+          <Button value="beststories" selected={storyType} onClick={handleClick}>
+            Best Stories
+          </Button>
+          <Button value="askstories" selected={storyType} onClick={handleClick}>
+            Ask Stories
+          </Button>
+          <Button value="showstories" selected={storyType} onClick={handleClick}>
+            Show Stories
+          </Button>
+          <Button value="jobstories" selected={storyType} onClick={handleClick}>
+            Job Stories
+          </Button>
         </div>
-    );
+      </div>
+      <StoryList key={storyType} type={storyType} />
+    </div>
+  );
 }
 
 function Button(props) {
-    const { value, children, onClick } = props;
-    const btnClassNames = [ 'button' ];
-    const iconClassNames = [ 'icon', 'fa-heart' ];
-    if (props.value === props.selected) {
-        iconClassNames.push('fas') ;
-        btnClassNames.push('selected');
-    } else {
-        iconClassNames.push('far');
-    }
-    return (
-        <div className={btnClassNames.join(' ')} data-value={value} onClick={onClick}>
-            <i className={iconClassNames.join(' ')} /> {children}
-        </div>
-    )
+  const { value, children, onClick } = props;
+  const btnClassNames = [ 'button' ];
+  const iconClassNames = [ 'icon', 'fa-heart' ];
+  if (props.value === props.selected) {
+    iconClassNames.push('fas') ;
+    btnClassNames.push('selected');
+  } else {
+    iconClassNames.push('far');
+  }
+  return (
+    <div className={btnClassNames.join(' ')} data-value={value} onClick={onClick}>
+      <i className={iconClassNames.join(' ')} /> {children}
+    </div>
+  )
 }
 
 export {
-    FrontEnd,
+  FrontEnd,
 };
 ```
 
@@ -117,43 +117,43 @@ import { StoryView } from 'story-view';
 import { get } from 'hacker-news';
 
 async function StoryList(props) {
-    const { type } = props;
-    const [ show ] = useProgress();
-    const stories = [];
+  const { type } = props;
+  const [ show ] = useProgress();
+  const stories = [];
 
+  render();
+  const storyIDs = await get(`/${type}.json`);
+  for (let i = 0, n = 5; i < storyIDs.length; i += n) {
+    const idChunk = storyIDs.slice(i, i + n);
+    const storyChunk = await Promise.all(idChunk.map(async (id) => {
+      return get(`/item/${id}.json`);
+    }));
+    for (let story of storyChunk) {
+      stories.push(story);
+    }
     render();
-    const storyIDs = await get(`/${type}.json`);
-    for (let i = 0, n = 5; i < storyIDs.length; i += n) {
-        const idChunk = storyIDs.slice(i, i + n);
-        const storyChunk = await Promise.all(idChunk.map(async (id) => {
-            return get(`/item/${id}.json`);
-        }));
-        for (let story of storyChunk) {
-            stories.push(story);
-        }
-        render();
-    }
+  }
 
-    function render() {
-        show(
-            <div className="story-list">
-                {stories.map(renderStory)}
-            </div>
-        );
-    }
+  function render() {
+    show(
+      <div className="story-list">
+        {stories.map(renderStory)}
+      </div>
+    );
+  }
 
-    function renderStory(story, i) {
-        if (story.deleted) {
-            return null;
-        }
-        return <StoryView story={story} key={story.id} />;
+  function renderStory(story, i) {
+    if (story.deleted) {
+      return null;
     }
+    return <StoryView story={story} key={story.id} />;
+  }
 }
 
 const component = Relaks.memo(StoryList);
 
 export {
-    component as StoryList
+  component as StoryList
 };
 ```
 
@@ -172,176 +172,176 @@ import { get } from 'hacker-news';
 var counts = {};
 
 async function StoryView(props) {
-    const { story } = props;
-    const [ showingComments, showComments ] = useState(false);
-    const [ renderingComments, renderComments ] = useState(false);
-    const [ show ] = useProgress();
-    const parts = [];
+  const { story } = props;
+  const [ showingComments, showComments ] = useState(false);
+  const [ renderingComments, renderComments ] = useState(false);
+  const [ show ] = useProgress();
+  const parts = [];
 
+  render();
+  if (story.parts && story.parts.length > 0) {
+    const idChunk = story.parts;
+    const partChunk = await Promise.all(idChunk.map((id) => {
+      return get(`/item/${id}.json`);
+    }));
+    for (let part of partChunk) {
+      parts.push(part);
+    }
     render();
-    if (story.parts && story.parts.length > 0) {
-        const idChunk = story.parts;
-        const partChunk = await Promise.all(idChunk.map((id) => {
-            return get(`/item/${id}.json`);
-        }));
-        for (let part of partChunk) {
-            parts.push(part);
-        }
-        render();
-    }
+  }
 
-    function render() {
-        show(
-            <div className="story-view">
-                <header>
-                    {story.title} <span className="by">by {story.by}</span>
-                </header>
-                <section>
-                    <div>
-                        {renderDecorativeImage()}
-                        {renderText()}
-                        {renderParts()}
-                        {renderURL()}
-                    </div>
-                </section>
-                <footer>
-                    {renderCommentCount()}
-                    {renderCommentList()}
-                </footer>
-            </div>
-        );
-    }
+  function render() {
+    show(
+      <div className="story-view">
+        <header>
+          {story.title} <span className="by">by {story.by}</span>
+        </header>
+        <section>
+          <div>
+            {renderDecorativeImage()}
+            {renderText()}
+            {renderParts()}
+            {renderURL()}
+          </div>
+        </section>
+        <footer>
+          {renderCommentCount()}
+          {renderCommentList()}
+        </footer>
+      </div>
+    );
+  }
 
-    function renderDecorativeImage() {
-        const index = story.id % decorativeImages.length;
-        const image = decorativeImages[index];
-        if (!(story.text || '').trim() && !story.url && (!story.parts || story.parts.length === 0)) {
-            return (
-                <span>
-                    <img className="extra-decoration" src={extraDecorativeImage} />
-                    <img className="decoration" src={image} />
-                </span>
-            );
-        } else {
-            return <img className="decoration" src={image} />
-        }
+  function renderDecorativeImage() {
+    const index = story.id % decorativeImages.length;
+    const image = decorativeImages[index];
+    if (!(story.text || '').trim() && !story.url && (!story.parts || story.parts.length === 0)) {
+      return (
+        <span>
+          <img className="extra-decoration" src={extraDecorativeImage} />
+          <img className="decoration" src={image} />
+        </span>
+      );
+    } else {
+      return <img className="decoration" src={image} />
     }
+  }
 
-    function renderText() {
-        return <p><HTML markup={story.text} /></p>;
+  function renderText() {
+    return <p><HTML markup={story.text} /></p>;
+  }
+
+  function renderParts() {
+    if (!story.parts || story.parts.length === 0) {
+      return null;
     }
+    return <ol>{story.parts.map(renderPart)}</ol>;
+  }
 
-    function renderParts() {
-        if (!story.parts || story.parts.length === 0) {
-            return null;
-        }
-        return <ol>{story.parts.map(renderPart)}</ol>;
+  function renderPart(id, i) {
+    const part = (parts) ? parts[index] : null;
+    if (part) {
+      return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
+    } else {
+      return <li key={i} className="pending">...</li>;
     }
+  }
 
-    function renderPart(id, i) {
-        const part = (parts) ? parts[index] : null;
-        if (part) {
-            return <li key={i}><HTML markup={part.text}/> ({part.score} votes)</li>;
-        } else {
-            return <li key={i} className="pending">...</li>;
-        }
-    }
+  function renderURL() {
+    return <a href={story.url} target="_blank">{story.url}</a>;
+  }
 
-    function renderURL() {
-        return <a href={story.url} target="_blank">{story.url}</a>;
-    }
-
-    function renderCommentCount() {
-        const count = (story.kids) ? story.kids.length : 0;
-        const label = `${count} comment` + (count === 1 ? '' : 's');
-        const classNames = [ 'comment-bar' ];
-        let onClick;
-        if (count > 0) {
-            classNames.push('clickable');
-            onClick = (evt) => {
-                if (showingComments) {
-                    showComments(false);
-                } else {
-                    renderComments(true);
-                    showComments(true);
-                }
-            };
-        }
-        return <div className={classNames.join(' ')} onClick={onClick}>{label}</div>;
-    }
-
-    function renderCommentList() {
-        let comments;
-        if (renderingComments) {
-            comments = <CommentList commentIDs={story.kids} replies={false} />;
-        }
-        const classNames = [ 'comment-container' ];
-        let onTransitionEnd
+  function renderCommentCount() {
+    const count = (story.kids) ? story.kids.length : 0;
+    const label = `${count} comment` + (count === 1 ? '' : 's');
+    const classNames = [ 'comment-bar' ];
+    let onClick;
+    if (count > 0) {
+      classNames.push('clickable');
+      onClick = (evt) => {
         if (showingComments) {
-            classNames.push('open');
+          showComments(false);
         } else {
-            if (renderingComments) {
-                onTransitionEnd = (evt) => {
-                    renderComments(false);
-                };
-            }
+          renderComments(true);
+          showComments(true);
         }
-        return (
-            <div className={classNames.join(' ')} onTransitionEnd={onTransitionEnd}>
-                {comments}
-            </div>
-        );
+      };
     }
+    return <div className={classNames.join(' ')} onClick={onClick}>{label}</div>;
+  }
+
+  function renderCommentList() {
+    let comments;
+    if (renderingComments) {
+      comments = <CommentList commentIDs={story.kids} replies={false} />;
+    }
+    const classNames = [ 'comment-container' ];
+    let onTransitionEnd
+    if (showingComments) {
+      classNames.push('open');
+    } else {
+      if (renderingComments) {
+        onTransitionEnd = (evt) => {
+          renderComments(false);
+        };
+      }
+    }
+    return (
+      <div className={classNames.join(' ')} onTransitionEnd={onTransitionEnd}>
+        {comments}
+      </div>
+    );
+  }
 }
 
 function HTML(props) {
-    const markup = { __html: props.markup };
-    return <span dangerouslySetInnerHTML={markup} />;
+  const markup = { __html: props.markup };
+  return <span dangerouslySetInnerHTML={markup} />;
 }
 
 const decorativeImages = [
-    require('../img/kitty-1.png'),
-    require('../img/kitty-2.png'),
-    require('../img/kitty-3.png'),
-    require('../img/kitty-4.png'),
-    require('../img/kitty-5.png'),
-    require('../img/kitty-6.png'),
-    require('../img/kitty-7.png'),
+  require('../img/kitty-1.png'),
+  require('../img/kitty-2.png'),
+  require('../img/kitty-3.png'),
+  require('../img/kitty-4.png'),
+  require('../img/kitty-5.png'),
+  require('../img/kitty-6.png'),
+  require('../img/kitty-7.png'),
 ];
 const extraDecorativeImage = require('../img/kitty-8.png');
 
 const component = Relaks.memo(StoryView);
 
 export {
-    component as StoryView
+  component as StoryView
 };
 ```
 
 The code above should be largely self-explanatory. Of the helper functions, `renderCommentList()` is the only one that warrants a closer look:
 
 ```javascript
-    function renderCommentList() {
-        let comments;
-        if (renderingComments) {
-            comments = <CommentList commentIDs={story.kids} replies={false} />;
-        }
-        const classNames = [ 'comment-container' ];
-        let onTransitionEnd
-        if (showingComments) {
-            classNames.push('open');
-        } else {
-            if (renderingComments) {
-                onTransitionEnd = (evt) => {
-                    renderComments(false);
-                };
-            }
-        }
-        return (
-            <div className={classNames.join(' ')} onTransitionEnd={onTransitionEnd}>
-                {comments}
-            </div>
-        );
+  function renderCommentList() {
+    let comments;
+    if (renderingComments) {
+      comments = <CommentList commentIDs={story.kids} replies={false} />;
     }
+    const classNames = [ 'comment-container' ];
+    let onTransitionEnd
+    if (showingComments) {
+      classNames.push('open');
+    } else {
+      if (renderingComments) {
+        onTransitionEnd = (evt) => {
+          renderComments(false);
+        };
+      }
+    }
+    return (
+      <div className={classNames.join(' ')} onTransitionEnd={onTransitionEnd}>
+        {comments}
+      </div>
+    );
+  }
 ```
 
 Comments are not shown initially. They appear when the user clicks on the bar. Two state variables are used to track this: `showingComments` and `renderingComments`. The second one is needed due to transition effect. We have to continue to render `CommentList` while the container div is collapsing. Only after the transition has ended can we stop rendering it.
@@ -357,39 +357,39 @@ import { CommentView } from 'comment-view';
 import { get } from 'hacker-news';
 
 async function CommentList(props) {
-    const { commentIDs, replies } = props;
-    const [ show ] = useProgress();
-    const comments = [];
+  const { commentIDs, replies } = props;
+  const [ show ] = useProgress();
+  const comments = [];
 
+  render();
+  for (let i = 0, n = 5; i < commentIDs.length; i += n) {
+    const idChunk = commentIDs.slice(i, i + n);
+    const commentChunk = await Promise.all(idChunk.map(async (id) => {
+      return get(`/item/${id}.json`);
+    }));
+    for (let comment of commentChunk) {
+      comments.push(comment);
+    }
     render();
-    for (let i = 0, n = 5; i < commentIDs.length; i += n) {
-        const idChunk = commentIDs.slice(i, i + n);
-        const commentChunk = await Promise.all(idChunk.map(async (id) => {
-            return get(`/item/${id}.json`);
-        }));
-        for (let comment of commentChunk) {
-            comments.push(comment);
-        }
-        render();
-    }
+  }
 
-    function render() {
-        show(
-            <div className="comment-list">
-                {commentIDs.map(renderComment)}
-            </div>
-        );
-    }
+  function render() {
+    show(
+      <div className="comment-list">
+        {commentIDs.map(renderComment)}
+      </div>
+    );
+  }
 
-    function renderComment(commentID, i) {
-        return <CommentView key={commentID} comment={comments[i]} reply={replies} />;
-    }
+  function renderComment(commentID, i) {
+    return <CommentView key={commentID} comment={comments[i]} reply={replies} />;
+  }
 }
 
 const component = Relaks.memo(CommentList);
 
 export {
-    component as CommentList,
+  component as CommentList,
 };
 ```
 
@@ -404,70 +404,70 @@ import React from 'react';
 import { CommentList } from 'comment-list';
 
 function CommentView(props) {
-    const { comment, reply } = props;
-    const iconClassNames = [ 'fa-heart', (reply) ? 'far' : 'fas' ];
-    let author, text;
-    if (comment) {
-        if (!comment.deleted) {
-            author = `${comment.by}:`;
-            text = <HTML markup={comment.text} />;
-        } else {
-            iconClassNames[0] = 'fa-sad-tear';
-            author = '[deleted]';
-        }
+  const { comment, reply } = props;
+  const iconClassNames = [ 'fa-heart', (reply) ? 'far' : 'fas' ];
+  let author, text;
+  if (comment) {
+    if (!comment.deleted) {
+      author = `${comment.by}:`;
+      text = <HTML markup={comment.text} />;
     } else {
-        author = <span className="pending">...</span>;
-        text = '\u00a0';
+      iconClassNames[0] = 'fa-sad-tear';
+      author = '[deleted]';
     }
+  } else {
+    author = <span className="pending">...</span>;
+    text = '\u00a0';
+  }
 
+  return (
+    <div className="comment">
+      <div className="icon">
+        <i className={iconClassNames.join(' ')} />
+      </div>
+      <div className="contents">
+        <div className="by">{author}</div>
+        <div className="text">{text}</div>
+        {renderReplies()}
+      </div>
+    </div>
+  );
+
+  function renderReplies() {
+    if (!comment || !comment.kids || !comment.kids.length) {
+      return null;
+    }
     return (
-        <div className="comment">
-            <div className="icon">
-                <i className={iconClassNames.join(' ')} />
-            </div>
-            <div className="contents">
-                <div className="by">{author}</div>
-                <div className="text">{text}</div>
-                {renderReplies()}
-            </div>
-        </div>
+      <div className="replies">
+        <CommentList commentIDs={comment.kids} replies={true} />
+      </div>
     );
-
-    function renderReplies() {
-        if (!comment || !comment.kids || !comment.kids.length) {
-            return null;
-        }
-        return (
-            <div className="replies">
-                <CommentList commentIDs={comment.kids} replies={true} />
-            </div>
-        );
-    }
+  }
 }
 
 function HTML(props) {
-    let markup = { __html: props.markup };
-    return <span dangerouslySetInnerHTML={markup} />;
+  let markup = { __html: props.markup };
+  return <span dangerouslySetInnerHTML={markup} />;
 }
 
 export {
-    CommentView
+  CommentView
 };
 ```
 
 A comment can have replies. `renderReplies()` draws them by creating an instance of `CommentList`:
 
 ```javascript
-    function renderReplies() {
-        if (!comment || !comment.kids || !comment.kids.length) {
-            return null;
-        }
-        return (
-            <div className="replies">
-                <CommentList commentIDs={comment.kids} replies={true} />
-            </div>
-        );
+  function renderReplies() {
+    if (!comment || !comment.kids || !comment.kids.length) {
+      return null;
     }
+    return (
+      <div className="replies">
+        <CommentList commentIDs={comment.kids} replies={true} />
+      </div>
+    );
+  }
 ```
 
 And that's it!
@@ -477,7 +477,7 @@ And that's it!
 Earlier you saw `FrontEnd` rendering `StoryList` with a key:
 
 ```javascript
-    <StoryList key={storyType} type={storyType} />
+  <StoryList key={storyType} type={storyType} />
 ```
 
 That's done to keep React from reusing the component when the story type changes. As the lists contain different sets of stories, it doesn't make sense to reuse the component. React will just end up wasting time diffing the component's children.
