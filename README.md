@@ -46,7 +46,7 @@ import { StoryList } from 'story-list';
 
 import 'style.scss';
 
-function FrontEnd(props) {
+export function FrontEnd(props) {
   const [ storyType, setStoryType ] = useState(localStorage.storyType || 'topstories');
 
   const handleClick = (evt) => {
@@ -98,10 +98,6 @@ function Button(props) {
     </div>
   )
 }
-
-export {
-  FrontEnd,
-};
 ```
 
 Pretty standard React code. The method renders a nav bar and a story list, which could be of different types ("top", "best", "job", etc.). One notable detail is the use of a key on `StoryList`. This will be addressed [later](#key-usage).
@@ -112,11 +108,11 @@ Pretty standard React code. The method renders a nav bar and a story list, which
 
 ```javascript
 import React from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { StoryView } from 'story-view';
 import { get } from 'hacker-news';
 
-async function StoryList(props) {
+export async function StoryList(props) {
   const { type } = props;
   const [ show ] = useProgress();
   const stories = [];
@@ -149,12 +145,6 @@ async function StoryList(props) {
     return <StoryView story={story} key={story.id} />;
   }
 }
-
-const component = Relaks.memo(StoryList);
-
-export {
-  component as StoryList
-};
 ```
 
 We first retrieve a list of story IDs (e.g. [/topstories.json](https://hacker-news.firebaseio.com/v0/topstories.json)). The list can contain upwards of 500 IDs. The API only permits the retrieval of a single story at a time. We obviously don't want to wait for 500 HTTP requests to finish before showing something. So we break the list into chunks of five and ask for redraw after each chunk is fetched.
@@ -165,11 +155,9 @@ We first retrieve a list of story IDs (e.g. [/topstories.json](https://hacker-ne
 
 ```javascript
 import React, { useState } from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { CommentList } from 'comment-list';
 import { get } from 'hacker-news';
-
-var counts = {};
 
 async function StoryView(props) {
   const { story } = props;
@@ -309,12 +297,6 @@ const decorativeImages = [
   require('../img/kitty-7.png'),
 ];
 const extraDecorativeImage = require('../img/kitty-8.png');
-
-const component = Relaks.memo(StoryView);
-
-export {
-  component as StoryView
-};
 ```
 
 The code above should be largely self-explanatory. Of the helper functions, `renderCommentList()` is the only one that warrants a closer look:
@@ -352,11 +334,11 @@ Comments are not shown initially. They appear when the user clicks on the bar. T
 
 ```javascript
 import React from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { CommentView } from 'comment-view';
 import { get } from 'hacker-news';
 
-async function CommentList(props) {
+export async function CommentList(props) {
   const { commentIDs, replies } = props;
   const [ show ] = useProgress();
   const comments = [];
@@ -385,12 +367,6 @@ async function CommentList(props) {
     return <CommentView key={commentID} comment={comments[i]} reply={replies} />;
   }
 }
-
-const component = Relaks.memo(CommentList);
-
-export {
-  component as CommentList,
-};
 ```
 
 The rendering code is slightly different here. Instead of loop through the list of comment objects, we loop through the list of comment IDs. This allows us to draw placeholders for the comments while they're loading.
@@ -403,7 +379,7 @@ The rendering code is slightly different here. Instead of loop through the list 
 import React from 'react';
 import { CommentList } from 'comment-list';
 
-function CommentView(props) {
+export function CommentView(props) {
   const { comment, reply } = props;
   const iconClassNames = [ 'fa-heart', (reply) ? 'far' : 'fas' ];
   let author, text;
@@ -449,10 +425,6 @@ function HTML(props) {
   let markup = { __html: props.markup };
   return <span dangerouslySetInnerHTML={markup} />;
 }
-
-export {
-  CommentView
-};
 ```
 
 A comment can have replies. `renderReplies()` draws them by creating an instance of `CommentList`:

@@ -1,9 +1,9 @@
 import React from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { StoryView } from './story-view.jsx';
 import { get } from './hacker-news.js';
 
-async function StoryList(props) {
+export async function StoryList(props) {
   const { type } = props;
   const [ show ] = useProgress();
   const stories = [];
@@ -36,9 +36,3 @@ async function StoryList(props) {
     return <StoryView story={story} key={story.id} />;
   }
 }
-
-const component = Relaks.memo(StoryList);
-
-export {
-  component as StoryList
-};

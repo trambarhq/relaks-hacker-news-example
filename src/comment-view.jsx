@@ -1,7 +1,7 @@
 import React from 'react';
 import { CommentList } from './comment-list.jsx';
 
-function CommentView(props) {
+export function CommentView(props) {
   const { comment, reply } = props;
   const iconClassNames = [ 'fa-heart', (reply) ? 'far' : 'fas' ];
   let author, text;
@@ -47,7 +47,3 @@ function HTML(props) {
   let markup = { __html: props.markup };
   return <span dangerouslySetInnerHTML={markup} />;
 }
-
-export {
-  CommentView
-};

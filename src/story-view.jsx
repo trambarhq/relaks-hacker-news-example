@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { get } from './hacker-news.js';
 import { CommentList } from './comment-list.jsx';
 
-var counts = {};
-
-async function StoryView(props) {
+export async function StoryView(props) {
   const { story } = props;
   const [ showingComments, showComments ] = useState(false);
   const [ renderingComments, renderComments ] = useState(false);
@@ -143,9 +141,3 @@ const decorativeImages = [
   require('../img/kitty-7.png').default,
 ];
 const extraDecorativeImage = require('../img/kitty-8.png').default;
-
-const component = Relaks.memo(StoryView);
-
-export {
-  component as StoryView
-};

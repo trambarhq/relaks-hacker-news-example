@@ -1,9 +1,9 @@
 import React from 'react';
-import Relaks, { useProgress } from 'relaks';
+import { useProgress } from 'relaks';
 import { get } from './hacker-news.js';
 import { CommentView } from './comment-view.jsx';
 
-async function CommentList(props) {
+export async function CommentList(props) {
   const { commentIDs, replies } = props;
   const [ show ] = useProgress();
   const comments = [];
@@ -32,9 +32,3 @@ async function CommentList(props) {
     return <CommentView key={commentID} comment={comments[i]} reply={replies} />;
   }
 }
-
-const component = Relaks.memo(CommentList);
-
-export {
-  component as CommentList,
-};

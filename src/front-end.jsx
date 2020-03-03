@@ -3,7 +3,7 @@ import { StoryList } from './story-list.jsx';
 
 import './style.scss';
 
-function FrontEnd(props) {
+export function FrontEnd(props) {
   const [ storyType, setStoryType ] = useState(localStorage.storyType || 'topstories');
 
   const handleClick = (evt) => {
@@ -55,7 +55,3 @@ function Button(props) {
     </div>
   )
 }
-
-export {
-  FrontEnd,
-};
